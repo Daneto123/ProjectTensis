@@ -9,34 +9,37 @@
 
 ## Влизане в директорията на проекта:
 > cd backend
+> cd frontend
 
 ## Конфигуриране на базата данни:
 Отворете src/main/resources/application.properties и задайте настройките за базата данни.
 
 ## Стартиране на React Frontend
-> cd frontend
-> npm start
-Приложението ще бъде достъпно на http://localhost:3000.
+> Приложението ще бъде достъпно на http://localhost:3000.
 
 ## Стартиране на Spring приложението: 
-> ./mvnw spring-boot:run
-Приложението ще бъде достъпно на http://localhost:8080.
+> Приложението ще бъде достъпно на http://localhost:8080.
 
 ## API Ендпойнти
-> GET /api/ducks: Връща списък с всички създадени патета.
-> POST /api/newduck: Създава ново пате със зададени параметри.
-> GET /api/ducks/{id}: Връща информация за конкретно пате по идентификатор.
-> PUT /api/ducks/{id}: Актуализира информацията за конкретно пате по идентификатор.
-> DELETE /api/ducks/{id}: Изтрива пате по идентификатор.
+> GET /api/users: Връща списък с всички създадени поребители.
+> POST /api/user: Актуализира информацията за потребител по идентификатор.
+> POST /api/updateUser: Създава нов потребител със зададени параметри.
+> GET /api/users/{id}: Връща информация за конкретен потребител по идентификатор.
+> GET /api/sensor/{id}: Връща информация за конкретен сензор по идентификатор.
+> PUT /api/sensor/{id}: Актуализира информацията за сензор по идентификатор.
+> DELETE /api/users/{id}: Изтрива потртебител по идентификатор.
+> DELETE /api/sensors/{id}: Изтрива сензор по идентификатор.
 
 ## База от данни
-MySql - https://www.mysql.com/ и по конкретно db4free.net онлайн сървър който да поддържа базата от данни
+> InfluxDB - https://www.influxdata.com/
+> Приложението ще бъде достъпно на http://localhost:8086.
 
 ## Документация
 > https://swagger.io/docs/
 
 ## Деплойване
-Kubernets - https://spring.io/guides/topicals/spring-on-kubernetes
+> Docker - https://www.docker.com/ 
+> стартира се с командата: docker-compose build --no-cache
 
 ## Функционалности
 Потребител ще може да се регистрира
