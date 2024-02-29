@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  reactjs:
+    build: ./frontend/iot-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+
+  java_spring:
+    build: ./backend/IotSensorArt
+    ports:
+      - "8080:8080"
+    depends_on:
+      - influxdb
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3005:3000"
+    depends_on:
+      - influxdb
+
+  influxdb:
+    image: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
+volumes:
+  influxdb_data:
