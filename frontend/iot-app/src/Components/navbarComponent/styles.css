@@ -1,0 +1,28 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  background-color: rgba(194, 237, 218, 0.5);
+  width: 100vw;
+  height: 100px;
+  position: fixed;
+  top: 0;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right : 20px;
+  font-size: large;
+}
+
+a:hover {
+  color: #ffcc00;
+}
+  
