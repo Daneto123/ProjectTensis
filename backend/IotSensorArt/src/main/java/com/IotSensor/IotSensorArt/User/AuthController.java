@@ -1,66 +1,37 @@
 package com.IotSensor.IotSensorArt.User;
 
+import com.IotSensor.IotSensorArt.InfluxDB.InfluxDBConfig;
 import com.IotSensor.IotSensorArt.InfluxDB.InfluxDBService;
-import com.google.api.Authentication;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.influxdb.InfluxDB;
-import org.influxdb.dto.Query;
-import org.influxdb.dto.QueryResult;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
-public class AuthController extends UserData {
-    @Autowired
-    private InfluxDB influxDB;
-    public AuthController(String username, String password) {
-        super(username, password, email, serviceName);
-        this.influxDB = new InfluxDBService().connectToInfluxDB();
-    }
+import java.util.List;
 
-    public boolean authenticate(String username, String password) {
-        // Query InfluxDB to retrieve user credentials
-        String query = "SELECT password FROM users WHERE username='" + username + "'";
-        QueryResult queryResult = influxDB.query(new Query(query, "yourDatabaseName"));
+public class AuthController {
 
-        if (queryResult.getResults() != null && !queryResult.getResults().isEmpty()) {
-            String storedPassword = extractStoredPassword(queryResult);
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody UserData loginData) {
 
-            return verifyPassword(password, storedPassword);
+        if (validateUser(loginData)) {
+            return ResponseEntity.ok("Login successful");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
-
-        return false;
     }
 
-    private boolean verifyPassword(String password, String storedPassword) {
-        return BCrypt.checkpw(password, storedPassword);
+    public boolean validateUser(UserData loginData) {
+        InfluxDBConfig db = new InfluxDBConfig();
+        InfluxDBService influxDB = db.connetToInfluxDB();
+
+        influxDB.connectToInfluxDB();
+
+        UserData user = (UserData) influxDB.findByUsername(loginData.getUsername());
+        return user != null && user.getPassword().equals(loginData.getPassword());
     }
 
-    private String extractStoredPassword(QueryResult queryResult) {
-        // Assuming one series and one result for simplicity
-        QueryResult.Result result = queryResult.getResults().get(0);
-        QueryResult.Series series = result.getSeries().get(0);
-
-        // Assuming 'password' is the field name in the 'users' measurement
-        List<List<Object>> values = series.getValues();
-        if (values != null && !values.isEmpty()) {
-            return values.get(0).get(series.getColumns().indexOf("password")).toString();
-        }
-
-        // No password found (shouldn't reach here for a well-formed query)
-        return null;
-    }
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new AuthResponse(jwt));
-    }
 }

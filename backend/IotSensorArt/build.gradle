@@ -27,6 +27,9 @@ dependencies {
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 	implementation 'org.influxdb:influxdb-java:2.20'
 	implementation 'org.mindrot:jbcrypt:0.4'
+	testImplementation 'org.testcontainers:testcontainers:1.16.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	implementation 'com.influxdb:influxdb-client-java:2.26.0'
 }
 
 tasks.named('test') {
