@@ -2,8 +2,10 @@ package com.IotSensor.IotSensorArt.Grafana;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 public class GrafanaService {
@@ -18,7 +20,11 @@ public class GrafanaService {
         String requestBody = "{\"name\":\"" + organizationName + "\",\"role\":\"Viewer\"}";
 
         // Set up the HTTP entity with headers and payload
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, "headers");
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json"); // Example header, adjust as needed
+
+        // Set up the HTTP entity with headers and payload
+        HttpEntity<String> entity = new HttpEntity<>("T", headers);
 
         // Set up RestTemplate
         RestTemplate restTemplate = new RestTemplate();

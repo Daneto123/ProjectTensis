@@ -15,7 +15,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("your.base.package.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.IotSensor.IotSensorArt.User"))
                 .paths(PathSelectors.any())
                 .build();
     }

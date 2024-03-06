@@ -1,17 +1,25 @@
 package com.IotSensor.IotSensorArt.InfluxDB;
 
+import com.IotSensor.IotSensorArt.User.UserData;
+import org.apache.catalina.User;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
+import org.influxdb.annotation.Column;
+import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class InfluxDBService {
 
-    private final InfluxDB influxDB;
+    private InfluxDB influxDB;
     @Value("${influxdb.url}")
     private String influxDbUrl;
 
@@ -25,41 +33,131 @@ public class InfluxDBService {
     private String influxDbDatabase;
 
     public InfluxDBService() {
+        this.influxDB = connectToInfluxDB();
     }
 
-    public InfluxDBService(InfluxDB influxDB, String influxDbUrl, String influxDbUsername, String influxDbPassword, String influxDbDatabase) {
-        this.influxDB = influxDB;
+    public InfluxDBService(String influxDbUrl, String influxDbUsername, String influxDbPassword, String influxDbDatabase) {
+        setInfluxDbUrl(influxDbUrl);
+        setInfluxDbUsername(influxDbUsername);
+        setInfluxDbPassword(influxDbPassword);
+        setInfluxDbDatabase(influxDbDatabase);
+    }
+
+    public String getInfluxDbUrl() {
+        return influxDbUrl;
+    }
+
+    public void setInfluxDbUrl(String influxDbUrl) {
         this.influxDbUrl = influxDbUrl;
+    }
+
+    public String getInfluxDbUsername() {
+        return influxDbUsername;
+    }
+
+    public void setInfluxDbUsername(String influxDbUsername) {
         this.influxDbUsername = influxDbUsername;
+    }
+
+    public String getInfluxDbPassword() {
+        return influxDbPassword;
+    }
+
+    public void setInfluxDbPassword(String influxDbPassword) {
         this.influxDbPassword = influxDbPassword;
+    }
+
+    public String getInfluxDbDatabase() {
+        return influxDbDatabase;
+    }
+
+    public void setInfluxDbDatabase(String influxDbDatabase) {
         this.influxDbDatabase = influxDbDatabase;
     }
 
-    public InfluxDBService(InfluxDB influxDB) {
-        this.influxDB = influxDB;
-    }
-
     public InfluxDB connectToInfluxDB() {
-        return InfluxDBFactory.connect(influxDbUrl, influxDbUsername, influxDbPassword);
+        return InfluxDBFactory.connect(getInfluxDbUrl(), getInfluxDbUsername(), getInfluxDbPassword());
     }
 
     public void writeTemperatureData(String typeroom, String namepi, double temp) {
+        BatchPoints batchPoints = BatchPoints
+                .database(getInfluxDbDatabase())
+                .retentionPolicy("defaultPolicy")
+                .build();
+
         Point point = Point.measurement("temperature")
-                .tag("typeroom", typeroom)
-                .tag("namepi", namepi)
+                .addField("typeroom", typeroom)
+                .addField("namepi", namepi)
                 .addField("temp", temp)
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .build();
 
-        influxDB.write("tempDB", "autogen", point); // Assuming "tempDB" is your InfluxDB bucket
+        batchPoints.point(point);
+
+        influxDB.write(batchPoints);
     }
 
     public void createDatabaseForUser(String username) {
         // Use InfluxDB Java client to create a new database for the user
-        InfluxDB influxDB = InfluxDBFactory.connect(influxDbUrl, "admin", "admin");
-        String databaseName = "user_" + username;
-        influxDB.createDatabase(databaseName);
+        InfluxDB influxDB = connectToInfluxDB();
+        setInfluxDbDatabase("user_" + username);
+        influxDB.createDatabase(getInfluxDbDatabase());
         influxDB.close();
+    }
+
+    public UserData findByUsername(String username) {
+
+        String query = "SELECT * FROM user WHERE username = '" + username + "'";
+        QueryResult queryResult = influxDB.query(new Query(query, influxDbDatabase));
+        List<List<Object>> values = new ArrayList<>();
+
+        for (QueryResult.Result result : queryResult.getResults()) {
+            for (QueryResult.Series series : result.getSeries()) {
+                // Iterate over the series and access data
+                System.out.println("Columns: " + series.getColumns());
+                System.out.println("Values: " + series.getValues());
+                values = series.getValues();
+                //userData.add(new UserData(series.getValues().get(1)))
+
+            }
+        }
+
+        for (List<Object> row : values) {
+            for (Object value : row) {
+                System.out.print(value + "\t");
+            }
+            System.out.println();
+        }
+
+        return (UserData) values.get(0);
+    }
+
+    public void deleteByUsername(String username) {
+
+        String deleteQuery = "DELETE FROM user WHERE username = '" + username + "'";
+        influxDB.query(new Query(deleteQuery, influxDbDatabase));
+
+    }
+
+    public boolean save(UserData userData) {
+        BatchPoints batchPoints = BatchPoints
+                .database("user")
+                .retentionPolicy("defaultPolicy")
+                .build();
+
+        Point point = Point.measurement("temperature")
+                .addField("username", userData.getUsername())
+                .addField("password", userData.getPassword())
+                .addField("email", userData.getEmail())
+                .addField("serviceName", userData.getServiceName()[0])
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .build();
+
+        batchPoints.point(point);
+
+        influxDB.write(batchPoints);
+
+        return true;
     }
 }
 

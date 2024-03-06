@@ -1,18 +1,27 @@
 package com.IotSensor.IotSensorArt.User;
 
-import java.util.Arrays;
+import org.influxdb.annotation.Column;
+import org.influxdb.annotation.Measurement;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Measurement(name = "user")
 public class UserData {
+    @Column(name = "username")
     private String username;
+    @Column(name = "password")
     private String password;
+    @Column(name = "email")
     private String email;
+    @Column(name = "serviceName")
     private String[] serviceName;
 
     public UserData(String username, String password, String email, String[] serviceName) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.serviceName = serviceName;
+        setUsername(username);
+        setPassword(password);
+        setEmail(email);
+        setServiceName(serviceName);
     }
 
     public String getUsername() {
@@ -20,7 +29,8 @@ public class UserData {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        if(username != null)
+            this.username = username;
     }
 
     public String getPassword() {
@@ -28,7 +38,7 @@ public class UserData {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        if(password != null) this.password = password;
     }
 
     public String getEmail() {
@@ -36,7 +46,7 @@ public class UserData {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        if(email != null) this.email = email;
     }
 
     public String[] getServiceName() {
@@ -44,16 +54,7 @@ public class UserData {
     }
 
     public void setServiceName(String[] serviceName) {
-        this.serviceName = serviceName;
+        if(serviceName != null) this.serviceName = serviceName;
     }
 
-    @Override
-    public String toString() {
-        return "UserData{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", serviceName=" + Arrays.toString(serviceName) +
-                '}';
-    }
 }
