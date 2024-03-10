@@ -13,7 +13,7 @@ public class IotSensorArtApplication {
 
 		// connect to db
 		InfluxDBConfig dbconfig = new InfluxDBConfig();
-		dbconfig.influxDB();
+		//dbconfig.connetToInfluxDB();
 	}
 
 }

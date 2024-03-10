@@ -1,16 +1,10 @@
 package com.IotSensor.IotSensorArt.InfluxDB;
 
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
 public class InfluxDBConfig {
 
     public InfluxDBConfig() {
     }
 
-    @Bean
     public InfluxDBService connetToInfluxDB() {
         String influxDbUrl = "http://host.docker.internal:8086/";
         String username = "sebis";
