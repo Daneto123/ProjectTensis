@@ -2,14 +2,18 @@ version: '3'
 
 services:
   reactjs:
-    build: ./frontend/iot-app
+    build: 
+        context: ./frontend/iot-app
+        dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - influxdb
 
   java_spring:
-    build: ./backend/IotSensorArt
+    build: 
+        context: ./backend/IotSensorArt
+        dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:

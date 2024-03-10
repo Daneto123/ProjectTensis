@@ -1,43 +1,32 @@
 package com.IotSensor.IotSensorArt.InfluxDB;
 
 import com.IotSensor.IotSensorArt.User.UserData;
-import org.apache.catalina.User;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
-import org.influxdb.annotation.Column;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Service
 public class InfluxDBService {
 
     private InfluxDB influxDB;
-    @Value("${influxdb.url}")
     private String influxDbUrl;
-
-    @Value("${influxdb.username}")
     private String influxDbUsername;
-
-    @Value("${influxdb.password}")
     private String influxDbPassword;
-
-    @Value("${influxdb.database}")
     private String influxDbDatabase;
 
     public InfluxDBService() {
-        this.influxDB = connectToInfluxDB();
+
     }
 
     public InfluxDBService(String influxDbUrl, String influxDbUsername, String influxDbPassword, String influxDbDatabase) {
-        setInfluxDbUrl(influxDbUrl);
+        this.influxDB = connectToInfluxDB();
+        influxDbUrl = "http://host.docker.internal:8086";
         setInfluxDbUsername(influxDbUsername);
         setInfluxDbPassword(influxDbPassword);
         setInfluxDbDatabase(influxDbDatabase);
